@@ -1,6 +1,6 @@
 const express = require("express");
 const user = require("./authRouter");
-const theater = require("./theaterRouter");
+const movie = require("./moviesRouter");
 
 const router = express.Router();
 
@@ -8,5 +8,6 @@ const router = express.Router();
 router.use("/api/v1/auth", user);
 
 // Theater API
-router.use("/api/theater", theater);
+router.use("/api/v1", movie);
+
 module.exports = router;

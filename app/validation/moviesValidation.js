@@ -1,10 +1,31 @@
 const Joi = require("joi");
 
-const createMovie = Joi.object({
-  theaterId: Joi.string().hex().length(24).required().messages({
-    "string.empty": "Theater is required",
-    "string.length": "Invalid theater id",
+const createTheater = Joi.object({
+  theaterName: Joi.string().required().messages({
+    "string.empty": "Theater name is required",
   }),
+
+  location: Joi.string().required().messages({
+    "string.empty": "Location is required",
+  }),
+
+  totalScreen: Joi.number().min(1).required().messages({
+    "number.base": "Total screen must be a number",
+    "number.min": "Theater must have at least 1 screen",
+    "any.required": "Total screen is required",
+  }),
+});
+
+const createMovie = Joi.object({
+  theaterId: Joi.array()
+    .items(Joi.string().hex().length(24))
+    .min(1)
+    .required()
+    .messages({
+      "array.base": "Theater ids must be an array",
+      "array.min": "At least one theater is required",
+      "any.required": "Theater is required",
+    }),
 
   movieName: Joi.string().min(3).max(50).required().messages({
     "string.empty": "Movie name is required",
@@ -41,5 +62,6 @@ const createMovie = Joi.object({
 });
 
 module.exports = {
+  createTheater,
   createMovie,
 };

@@ -2,10 +2,17 @@ const mongoose = require("mongoose");
 
 const movieSchema = new mongoose.Schema(
   {
-    theaterId: {
+    adminId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Theater",
+      ref: "User",
     },
+
+    theaterId: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Theater",
+      },
+    ],
 
     movieName: {
       type: String,
