@@ -1,0 +1,64 @@
+{
+    "definition": {
+        "openapi": "3.0.0",
+        "info": {
+            "title": "Movie Ticket Booking API",
+            "version": "1.0.0",
+            "description": "Movie ticket booking api.",
+            "contact": {
+                "name": "Avijit Roy"
+            }
+        },
+        "servers": [
+            {
+                "url": "http://localhost:4500",
+                "description": "Local Development Server"
+            }
+        ],
+        "tags": [
+            {
+                "name": "Auth",
+                "description": "Authentication APIs"
+            },
+            {
+                "name": "Theater",
+                "description": "Theater Management APIs"
+            },
+            {
+                "name": "Movie",
+                "description": "Movie Management APIs"
+            },
+            {
+                "name": "Shows",
+                "description": "Booking Management APIs"
+            },
+            {
+                "name": "Booking",
+                "description": "Booking Management APIs"
+            }
+        ],
+        "components": {
+            "securitySchemes": {
+                "bearerAuth": {
+                    "type": "http",
+                    "scheme": "bearer",
+                    "bearerFormat": "JWT"
+                },
+                "secretKey": {
+                    "type": "apiKey",
+                    "in": "header",
+                    "name": "x-api-key"
+                }
+            }
+        },
+        "security": [
+            {
+                "bearerAuth": []
+            }
+        ]
+    },
+    "apis": [
+        "./app/routes/*.js",
+        "./app/routes/**/*.js"
+    ]
+}
