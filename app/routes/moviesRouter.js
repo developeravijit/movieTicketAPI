@@ -39,6 +39,7 @@ const movie = express.Router();
  *               - theaterName
  *               - location
  *               - totalScreen
+ *               - screens
  *             properties:
  *               theaterName:
  *                 type: string
@@ -48,7 +49,61 @@ const movie = express.Router();
  *                 example: Kolkata
  *               totalScreen:
  *                 type: integer
- *                 example: 5
+ *                 example: 2
+ *               screens:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     rows:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         required:
+ *                           - row
+ *                           - totalSeats
+ *                           - seatType
+ *                           - price
+ *                         properties:
+ *                           row:
+ *                             type: string
+ *                             example: A
+ *                           totalSeats:
+ *                             type: integer
+ *                             example: 10
+ *                           seatType:
+ *                             type: string
+ *                             enum:
+ *                               - Regular
+ *                               - Premium
+ *                               - Recliner
+ *                             example: Regular
+ *                           price:
+ *                             type: number
+ *                             example: 150
+ *           example:
+ *             theaterName: PVR Cinemas
+ *             location: Kolkata
+ *             totalScreen: 2
+ *             screens:
+ *               - rows:
+ *                   - row: A
+ *                     totalSeats: 10
+ *                     seatType: Regular
+ *                     price: 150
+ *                   - row: B
+ *                     totalSeats: 10
+ *                     seatType: Premium
+ *                     price: 250
+ *               - rows:
+ *                   - row: A
+ *                     totalSeats: 5
+ *                     seatType: Recliner
+ *                     price: 500
+ *                   - row: B
+ *                     totalSeats: 5
+ *                     seatType: Premium
+ *                     price: 250
  *     responses:
  *       201:
  *         description: Theater created successfully

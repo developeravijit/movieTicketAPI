@@ -14,7 +14,7 @@ const bookingSchema = new mongoose.Schema(
       required: true,
     },
 
-    seats: [
+    seat: [
       {
         row: String,
         seatNo: Number,

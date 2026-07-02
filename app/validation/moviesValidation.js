@@ -1,32 +1,73 @@
 const Joi = require("joi");
 
 const createTheater = Joi.object({
-  theaterName: Joi.string().required().messages({
+  theaterName: Joi.string().trim().min(3).required().messages({
     "string.empty": "Theater name is required",
+    "string.min": "Theater name must be at least 3 characters",
+    "any.required": "Theater name is required",
   }),
 
-  location: Joi.string().required().messages({
+  location: Joi.string().trim().required().messages({
     "string.empty": "Location is required",
+    "any.required": "Location is required",
   }),
 
-  totalScreen: Joi.number().min(1).required().messages({
+  totalScreen: Joi.number().integer().min(1).required().messages({
     "number.base": "Total screen must be a number",
+    "number.integer": "Total screen must be an integer",
     "number.min": "Theater must have at least 1 screen",
     "any.required": "Total screen is required",
   }),
+
+  screens: Joi.array()
+    .min(1)
+    .items(
+      Joi.object({
+        rows: Joi.array()
+          .min(1)
+          .items(
+            Joi.object({
+              row: Joi.string().trim().uppercase().required().messages({
+                "string.empty": "Row is required",
+                "any.required": "Row is required",
+              }),
+
+              totalSeats: Joi.number().integer().min(1).required().messages({
+                "number.base": "Total seats must be a number",
+                "number.integer": "Total seats must be an integer",
+                "number.min": "Row must have at least one seat",
+                "any.required": "Total seats is required",
+              }),
+
+              seatType: Joi.string()
+                .valid("Regular", "Premium", "Recliner")
+                .required()
+                .messages({
+                  "any.only": "Seat type must be Regular, Premium or Recliner",
+                  "any.required": "Seat type is required",
+                }),
+
+              price: Joi.number().min(0).required().messages({
+                "number.base": "Price must be a number",
+                "number.min": "Price cannot be negative",
+                "any.required": "Price is required",
+              }),
+            }),
+          )
+          .required(),
+      }),
+    )
+    .length(Joi.ref("totalScreen"))
+    .required()
+    .messages({
+      "array.base": "Screens must be an array",
+      "array.min": "At least one screen is required",
+      "array.length": "Screens count must match totalScreen",
+      "any.required": "Screens are required",
+    }),
 });
 
 const createMovie = Joi.object({
-  theaterId: Joi.array()
-    .items(Joi.string().hex().length(24))
-    .min(1)
-    .required()
-    .messages({
-      "array.base": "Theater ids must be an array",
-      "array.min": "At least one theater is required",
-      "any.required": "Theater is required",
-    }),
-
   movieName: Joi.string().min(3).max(50).required().messages({
     "string.empty": "Movie name is required",
     "string.min": "Movie name must be at least 3 characters",
@@ -61,7 +102,42 @@ const createMovie = Joi.object({
   }),
 });
 
+const assignMovie = Joi.object({
+  movieId: Joi.string().required().messages({
+    "string.empty": "Movie Id is required",
+  }),
+
+  theaterId: Joi.string().required().messages({
+    "string.empty": "Movie Id is required",
+  }),
+
+  screen: Joi.string().required().messages({
+    "string.empty": "Movie Id is required",
+  }),
+
+  showDate: Joi.string().required().messages({
+    "string.empty": "Movie Id is required",
+  }),
+
+  showTime: Joi.string().required().messages({
+    "string.empty": "Movie Id is required",
+  }),
+
+  endTime: Joi.string().required().messages({
+    "string.empty": "Movie Id is required",
+  }),
+
+  ticketPrice: Joi.string().required().messages({
+    "string.empty": "Movie Id is required",
+  }),
+
+  totalSeats: Joi.string().required().messages({
+    "string.empty": "Movie Id is required",
+  }),
+});
+
 module.exports = {
   createTheater,
   createMovie,
+  assignMovie
 };

@@ -19,8 +19,36 @@ const theaterSchema = new mongoose.Schema(
 
     totalScreen: {
       type: Number,
-      min: [1, "Theater minimum have 1 screen"],
+      required: true,
+      min: [1, "Theater must have at least 1 screen"],
     },
+
+    screen: [
+      {
+        screenNumber: {
+          type: Number,
+          required: true,
+        },
+        name: {
+          type: String,
+          required: true,
+        },
+        totalSeats: {
+          type: Number,
+          required: true,
+        },
+        seats: [
+          {
+            seatNumber: String,
+            seatType: {
+              type: String,
+              enum: ["Regular", "Premium", "Recliner"],
+            },
+            price: Number,
+          },
+        ],
+      },
+    ],
   },
   { timestamps: true, versionKey: false },
 );
