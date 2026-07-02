@@ -227,20 +227,124 @@ class moviesController {
 
       const { movieId, theaterId, screen, showDate, showTime, endTime } = value;
 
-      const admin = req.user.body;
+      const admin = req.user.id;
 
-      const alreadyAssign = await Show.find({
+      const movie = await Movie.findOne({
+        _id: movieId,
+        adminId: admin,
+      });
+
+      if (!movie) {
+        return res.status(httpCodes.not_found).json({
+          success: false,
+          message: "Movie not found",
+        });
+      }
+
+      const theater = await Theater.findOne({
+        _id: theaterId,
+        adminId: admin,
+      });
+
+      if (!theater) {
+        return res.status(httpCodes.not_found).json({
+          success: false,
+          message: "Theater not found",
+        });
+      }
+
+      const selectedScreen = theater.screen.find(
+        (item) => item.screenNumber === screen,
+      );
+
+      if (!selectedScreen) {
+        return res.status(httpCodes.bad_request).json({
+          success: false,
+          message: `Screen ${screen} does not exist`,
+        });
+      }
+      const existingShow = await Show.findOne({
+        theaterId,
+        screen,
+        showDate,
+        showTime,
+      });
+
+      if (existingShow) {
+        return res.status(httpCodes.bad_request).json({
+          success: false,
+          message: `${screen} screen is already has a movie at this time`,
+        });
+      }
+
+      const movieData = new Show({
+        adminId: admin,
         movieId,
         theaterId,
         screen,
+        showDate,
+        showTime,
+        endTime,
       });
 
-      if (alreadyAssign) {
-        return res.status(httpCodes.bad_request).json({
-          success: false,
-          message: "Movie already assigned",
-        });
-      }
+      const data = await movieData.save();
+
+      return res.status(httpCodes.ok).json({
+        success: true,
+        message: "Movie is assign to the theater",
+        data,
+      });
+    } catch (error) {
+      return res.status(httpCodes.server_error).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  // Show Assigned Movies
+  async showAssignedMovies(req, res) {
+    try {
+      const data = await Show.aggregate([
+        {
+          $lookup: {
+            from: "theaters",
+            localField: "theaterId",
+            foreignField: "_id",
+            as: "theater",
+          },
+        },
+        { $unwind: "$theater" },
+        {
+          $lookup: {
+            from: "movies",
+            localField: "movieId",
+            foreignField: "_id",
+            as: "movie",
+          },
+        },
+        { $unwind: "$movie" },
+
+        {
+          $project: {
+            theaterName: "$theater.theaterName",
+            location: "$theater.location",
+            // screenNumber: "$theater.screen.screenNumber",
+            // screenName: "$theater.screen.name",
+            screen: 1,
+            showDate: 1,
+            showTime: 1,
+            endTime: 1,
+            movieName: "$movie.movieName",
+          },
+        },
+      ]);
+
+      return res.status(httpCodes.ok).json({
+        success: false,
+        message: "All Assigned Movies",
+        data,
+      });
     } catch (error) {
       return res.status(httpCodes.server_error).json({
         success: false,

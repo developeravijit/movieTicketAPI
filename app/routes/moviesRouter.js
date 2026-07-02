@@ -19,7 +19,6 @@ const movie = express.Router();
  *   description: Movie Management APIs
  */
 
-// Create Theater
 /**
  * @swagger
  * /api/v1/create/theater:
@@ -59,11 +58,6 @@ const movie = express.Router();
  *                       type: array
  *                       items:
  *                         type: object
- *                         required:
- *                           - row
- *                           - totalSeats
- *                           - seatType
- *                           - price
  *                         properties:
  *                           row:
  *                             type: string
@@ -73,42 +67,15 @@ const movie = express.Router();
  *                             example: 10
  *                           seatType:
  *                             type: string
- *                             enum:
- *                               - Regular
- *                               - Premium
- *                               - Recliner
  *                             example: Regular
  *                           price:
  *                             type: number
  *                             example: 150
- *           example:
- *             theaterName: PVR Cinemas
- *             location: Kolkata
- *             totalScreen: 2
- *             screens:
- *               - rows:
- *                   - row: A
- *                     totalSeats: 10
- *                     seatType: Regular
- *                     price: 150
- *                   - row: B
- *                     totalSeats: 10
- *                     seatType: Premium
- *                     price: 250
- *               - rows:
- *                   - row: A
- *                     totalSeats: 5
- *                     seatType: Recliner
- *                     price: 500
- *                   - row: B
- *                     totalSeats: 5
- *                     seatType: Premium
- *                     price: 250
  *     responses:
  *       201:
  *         description: Theater created successfully
  *       400:
- *         description: Validation error or theater already exists
+ *         description: Validation error
  *       401:
  *         description: Unauthorized
  *       500:
@@ -121,12 +88,11 @@ movie.post(
   moviesController.createTheater,
 );
 
-// Create Movie
 /**
  * @swagger
  * /api/v1/create/movie:
  *   post:
- *     summary: Create a new movie and assign it to theaters
+ *     summary: Create a new movie
  *     tags: [Movie]
  *     security:
  *       - bearerAuth: []
@@ -145,7 +111,6 @@ movie.post(
  *               - cast
  *               - director
  *               - releaseDate
- *               - theaterId
  *             properties:
  *               movieName:
  *                 type: string
@@ -158,53 +123,22 @@ movie.post(
  *                 example: English
  *               duration:
  *                 type: integer
- *                 example: 180
+ *                 example: 181
  *               cast:
  *                 type: string
- *                 example: Robert Downey Jr, Chris Evans
+ *                 example: Robert Downey Jr., Chris Evans
  *               director:
  *                 type: string
- *                 example: Anthony Russo
+ *                 example: Anthony Russo, Joe Russo
  *               releaseDate:
  *                 type: string
  *                 format: date
- *                 example: 2026-07-01
- *               theaterId:
- *                 type: array
- *                 items:
- *                   type: string
- *                   example: 6864f6a6c0b6f8a9b1234567
- *                 example:
- *                   - 6864f6a6c0b6f8a9b1234567
- *                   - 6864f6a6c0b6f8a9b1234568
+ *                 example: 2019-04-26
  *     responses:
  *       200:
- *         description: Movie created and assigned to theaters successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: Movie created and assigned to theaters successfully
- *                 data:
- *                   type: object
+ *         description: Movie created successfully
  *       400:
- *         description: Validation error, movie already exists, or invalid theater ids
- *         content:
- *           application/json:
- *             schema:
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: false
- *                 message:
- *                   type: string
- *                   example: Theater ids are invalid
+ *         description: Validation error or movie already exists
  *       401:
  *         description: Unauthorized
  *       500:
@@ -216,5 +150,115 @@ movie.post(
   secretKeyCheck,
   moviesController.createMovie,
 );
+
+/**
+ * @swagger
+ * /api/v1/assign-movie:
+ *   post:
+ *     summary: Assign a movie to a theater screen
+ *     tags: [Theater]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - movieId
+ *               - theaterId
+ *               - screen
+ *               - showDate
+ *               - showTime
+ *               - endTime
+ *             properties:
+ *               movieId:
+ *                 type: string
+ *                 example: 6867ab12cd34ef56gh78ij90
+ *               theaterId:
+ *                 type: string
+ *                 example: 6867ab12cd34ef56gh78ij91
+ *               screen:
+ *                 type: integer
+ *                 example: 1
+ *               showDate:
+ *                 type: string
+ *                 format: date
+ *                 example: 2026-07-03
+ *               showTime:
+ *                 type: string
+ *                 example: 10:00 AM
+ *               endTime:
+ *                 type: string
+ *                 example: 01:00 PM
+ *     responses:
+ *       200:
+ *         description: Movie assigned successfully
+ *       400:
+ *         description: Validation error or show already exists
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Movie or theater not found
+ *       500:
+ *         description: Internal server error
+ */
+movie.post("/assign-movie", authCheck, moviesController.assignMovie);
+
+/**
+ * @swagger
+ * /api/v1/assigned/movies:
+ *   get:
+ *     summary: Get all assigned movies
+ *     tags: [Shows]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of assigned movies
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: All Assigned Movies
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       theaterName:
+ *                         type: string
+ *                         example: PVR Cinemas
+ *                       location:
+ *                         type: string
+ *                         example: Kolkata
+ *                       movieName:
+ *                         type: string
+ *                         example: Avengers Endgame
+ *                       screen:
+ *                         type: integer
+ *                         example: 1
+ *                       showDate:
+ *                         type: string
+ *                         example: 2026-07-03T00:00:00.000Z
+ *                       showTime:
+ *                         type: string
+ *                         example: 10:00 AM
+ *                       endTime:
+ *                         type: string
+ *                         example: 01:00 PM
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+movie.get("/assigned/movies", authCheck, moviesController.showAssignedMovies);
 
 module.exports = movie;

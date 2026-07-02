@@ -111,7 +111,7 @@ const assignMovie = Joi.object({
     "string.empty": "Movie Id is required",
   }),
 
-  screen: Joi.string().required().messages({
+  screen: Joi.number().integer().min(1).required().messages({
     "string.empty": "Movie Id is required",
   }),
 
@@ -126,18 +126,10 @@ const assignMovie = Joi.object({
   endTime: Joi.string().required().messages({
     "string.empty": "Movie Id is required",
   }),
-
-  ticketPrice: Joi.string().required().messages({
-    "string.empty": "Movie Id is required",
-  }),
-
-  totalSeats: Joi.string().required().messages({
-    "string.empty": "Movie Id is required",
-  }),
 });
 
 module.exports = {
   createTheater,
   createMovie,
-  assignMovie
+  assignMovie,
 };
